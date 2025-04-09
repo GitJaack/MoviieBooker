@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { SignUpDTO } from './dto/signup.dto';
 import { PrismaService } from 'prisma/prisma.service';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -42,14 +43,14 @@ export class AuthService {
     };
   }
 
-  async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
+  async signIn(signInData: LoginDTO): Promise<{ access_token: string }> {
+    const user = await this.usersService.findOne(signInData.username);
     if (!user) throw new UnauthorizedException('User not found');
 
-    const passwordValid = await bcrypt.compare(pass, user.password);
+    const passwordValid = await bcrypt.compare(
+      signInData.password,
+      user.password,
+    );
     if (!passwordValid) {
       throw new UnauthorizedException('Incorrect password');
     }

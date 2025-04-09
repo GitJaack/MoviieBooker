@@ -43,7 +43,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login and get access token' })
   @ApiResponse({ status: 200, description: 'User logged in' })
   async signIn(@Body() loginData: LoginDTO) {
-    return this.authService.signIn(loginData.username, loginData.password);
+    return this.authService.signIn(loginData);
   }
 
   @Delete('delete/:id')

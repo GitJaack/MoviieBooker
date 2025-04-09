@@ -4,10 +4,20 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { MoviesService } from './movies/movies.service';
+import { MoviesController } from './movies/movies.controller';
+import { MoviesModule } from './movies/movies.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [AuthModule, UsersModule, ConfigModule.forRoot({ isGlobal: true })],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    AuthModule,
+    UsersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    MoviesModule,
+    HttpModule,
+  ],
+  controllers: [AppController, MoviesController],
+  providers: [AppService, MoviesService],
 })
 export class AppModule {}
