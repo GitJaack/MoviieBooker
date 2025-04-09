@@ -12,4 +12,16 @@ model User {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
+  reservations Reservation[]
+}
+
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  movieId   Int
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  @@index([userId, startTime])
 }
