@@ -24,6 +24,7 @@ export class MoviesController {
     description: 'List of movies now playing',
     type: Object,
   })
+  @ApiOperation({ summary: 'Films en salle actuellement' })
   @Get('now-playing')
   async getNowPlaying(@Query('page') page: number = 1) {
     return this.moviesService.getNowPlaying(Number(page));
@@ -37,6 +38,8 @@ export class MoviesController {
     type: String,
     description: 'Titre du film à rechercher',
   })
+  @ApiResponse({ status: 200, description: 'Films trouvés' })
+  @ApiResponse({ status: 404, description: 'Film non trouvé' })
   searchMovies(@Query('title') title: string) {
     return this.moviesService.searchMovie(title);
   }
@@ -49,6 +52,8 @@ export class MoviesController {
     type: String,
     description: 'ID du film TMDB',
   })
+  @ApiResponse({ status: 200, description: 'Détails du film' })
+  @ApiResponse({ status: 404, description: 'Film non trouvé' })
   getMovieDetails(@Param('id') id: string) {
     return this.moviesService.getMovieDetails(id);
   }
@@ -62,20 +67,10 @@ export class MoviesController {
   @Get('movies')
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiQuery({
-    name: 'sort',
-    required: false,
-    enum: ['popular', 'top_rated', 'upcoming'],
-  })
-  getMovies(
-    @Query('page') page?: number,
-    @Query('search') search?: string,
-    @Query('sort') sort?: string,
-  ) {
+  getMovies(@Query('page') page?: number, @Query('search') search?: string) {
     return this.moviesService.getMovies({
       page: Number(page) || 1,
       search,
-      sort,
     });
   }
 }

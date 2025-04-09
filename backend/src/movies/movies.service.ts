@@ -37,43 +37,73 @@ export class MoviesService {
     }
   }
 
-  async searchMovie(title: string) {
-    const url = `${this.getUrl('/search/movie')}?query=${encodeURIComponent(title)}`;
-    const response = await lastValueFrom(this.httpService.get(url));
-    return response.data;
+  async searchMovie(query: string, page: number = 1) {
+    const url = this.getUrl(
+      `/search/movie?query=${encodeURIComponent(query)}&page=${page}`,
+    );
+
+    const response$ = this.httpService.get(url, this.getAuthHeaders());
+    const response = await lastValueFrom(response$);
+    const data = response.data;
+
+    const sortedResults = data.results.sort((a, b) =>
+      a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }),
+    );
+
+    return {
+      results: sortedResults,
+      page: data.page,
+      total_pages: data.total_pages,
+      total_results: data.total_results,
+    };
   }
 
   async getMovieDetails(movieId: string) {
     const url = this.getUrl(`/movie/${movieId}`);
-    const response = await lastValueFrom(this.httpService.get(url));
-    return response.data;
+
+    const response$ = this.httpService.get(url, this.getAuthHeaders());
+
+    try {
+      const response = await lastValueFrom(response$);
+
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching movie details:', error);
+      throw new Error('Failed to fetch movie details');
+    }
   }
 
   async getGenres() {
     const url = this.getUrl('/genre/movie/list');
-    const response = await lastValueFrom(this.httpService.get(url));
-    return response.data;
+    const response$ = this.httpService.get(url, this.getAuthHeaders());
+
+    try {
+      const response = await lastValueFrom(response$);
+
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching movie details:', error);
+      throw new Error('Failed to fetch movie details');
+    }
   }
 
-  async getMovies(options: { page?: number; search?: string; sort?: string }) {
-    const { page = 1, search, sort } = options;
-
-    // S'il y a un filtre de recherche, on utilise le endpoint de recherche
+  async getMovies({ page = 1, search }: { page?: number; search?: string }) {
     if (search) {
-      const url = `${this.getUrl('/search/movie')}&query=${encodeURIComponent(search)}&page=${page}`;
-      const response = await lastValueFrom(this.httpService.get(url));
-      return response.data;
+      return this.searchMovie(search, page);
     }
 
-    // Sinon, on utilise un endpoint basé sur le tri
-    let endpoint = '/movie/now_playing'; // par défaut
+    const url = `/movie/popular?page=${page}`;
+    const response$ = this.httpService.get(
+      this.getUrl(url),
+      this.getAuthHeaders(),
+    );
+    const response = await lastValueFrom(response$);
 
-    if (sort === 'popular') endpoint = '/movie/popular';
-    if (sort === 'top_rated') endpoint = '/movie/top_rated';
-    if (sort === 'upcoming') endpoint = '/movie/upcoming';
-
-    const url = `${this.getUrl(endpoint)}&page=${page}`;
-    const response = await lastValueFrom(this.httpService.get(url));
-    return response.data;
+    return {
+      results: response.data.results,
+      page: response.data.page,
+      total_pages: response.data.total_pages,
+      total_results: response.data.total_results,
+    };
   }
 }
