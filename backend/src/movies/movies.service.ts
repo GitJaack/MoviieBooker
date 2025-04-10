@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
 
@@ -46,6 +46,16 @@ export class MoviesService {
     const response = await lastValueFrom(response$);
     const data = response.data;
 
+    if (data.results.length === 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          message: 'Movie not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     const sortedResults = data.results.sort((a, b) =>
       a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }),
     );
@@ -58,7 +68,7 @@ export class MoviesService {
     };
   }
 
-  async getMovieDetails(movieId: string) {
+  async getMovieDetails(movieId: number) {
     const url = this.getUrl(`/movie/${movieId}`);
 
     const response$ = this.httpService.get(url, this.getAuthHeaders());
@@ -68,8 +78,13 @@ export class MoviesService {
 
       return response.data;
     } catch (error) {
-      console.error('Error fetching movie details:', error);
-      throw new Error('Failed to fetch movie details');
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          message: 'Movie not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 

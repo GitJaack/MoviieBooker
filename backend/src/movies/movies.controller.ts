@@ -54,19 +54,22 @@ export class MoviesController {
   })
   @ApiResponse({ status: 200, description: 'Détails du film' })
   @ApiResponse({ status: 404, description: 'Film non trouvé' })
-  getMovieDetails(@Param('id') id: string) {
+  getMovieDetails(@Param('id') id: number) {
     return this.moviesService.getMovieDetails(id);
   }
 
   @Get('genres')
-  @ApiOperation({ summary: 'Obtenir la liste des genres de films' })
+  @ApiOperation({ summary: 'Obtenir la liste de films' })
   getGenres() {
     return this.moviesService.getGenres();
   }
 
   @Get('movies')
+  @ApiOperation({ summary: 'Obtenir la liste des genres de films' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiResponse({ status: 200, description: 'Film trouvé' })
+  @ApiResponse({ status: 404, description: 'Film non trouvé' })
   getMovies(@Query('page') page?: number, @Query('search') search?: string) {
     return this.moviesService.getMovies({
       page: Number(page) || 1,

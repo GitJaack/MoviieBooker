@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  username  String   @unique
+  email  String   @unique
   password  String
   createdAt DateTime @default(now())
   reservations Reservation[]
@@ -20,6 +20,7 @@ model Reservation {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   movieId   Int
+  movieTitle  String
   startTime DateTime
   endTime   DateTime
   createdAt DateTime @default(now())

@@ -20,11 +20,11 @@ export class AuthService {
 
   async signUp(signUpData: SignUpDTO) {
     const existingUser = await this.prisma.user.findUnique({
-      where: { username: signUpData.username },
+      where: { email: signUpData.email },
     });
 
     if (existingUser) {
-      throw new ConflictException('Username already exists');
+      throw new ConflictException('Email already exists');
     }
 
     const saltOrRounds = 10;
@@ -32,7 +32,7 @@ export class AuthService {
 
     const newUser = await this.prisma.user.create({
       data: {
-        username: signUpData.username,
+        email: signUpData.email,
         password: hashedPassword,
       },
     });
@@ -44,8 +44,11 @@ export class AuthService {
   }
 
   async signIn(signInData: LoginDTO): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(signInData.username);
-    if (!user) throw new UnauthorizedException('User not found');
+    const user = await this.usersService.findOne(signInData.email);
+    if (!user)
+      throw new UnauthorizedException(
+        `User not found for email : ${signInData.email}`,
+      );
 
     const passwordValid = await bcrypt.compare(
       signInData.password,
@@ -55,9 +58,8 @@ export class AuthService {
       throw new UnauthorizedException('Incorrect password');
     }
 
-    const payload = { sub: user.id, username: user.username };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: this.jwtService.sign({ userId: user.id }),
     };
   }
 }
