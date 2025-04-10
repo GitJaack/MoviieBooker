@@ -14,7 +14,7 @@ const Home = () => {
     queryKey: ["nowPlaying"],
     queryFn: async () => {
       const response = await axios.get(
-        "http://localhost:3000/movies/now-playing"
+        "https://moviiebooker-0eje.onrender.com/api/movies/now-playing"
       );
       return response.data.results as Movie[];
     },
