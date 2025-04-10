@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:5174',
-      'https://moviiebooker-0eje.onrender.com/api',
+      'https://moviiebooker-0eje.onrender.com',
       'moviebooker-efrei-jack.netlify.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

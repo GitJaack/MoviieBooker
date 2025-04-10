@@ -26,7 +26,7 @@ const MovieDetails = () => {
     queryKey: ["movie", id],
     queryFn: async () => {
       const response = await axios.get(
-        `https://moviiebooker-0eje.onrender.com/api/movies/movie/${id}`
+        `https://moviiebooker-0eje.onrender.com/movies/movie/${id}`
       );
       return response.data as Movie;
     },
@@ -36,7 +36,7 @@ const MovieDetails = () => {
     mutationFn: async () => {
       const startTime = `${selectedDate}T${selectedTime}:00.000Z`;
       return axios.post(
-        "https://moviiebooker-0eje.onrender.com/api/reservations",
+        "https://moviiebooker-0eje.onrender.com/reservations",
         {
           movieId: Number(id),
           startTime,
